@@ -1,0 +1,64 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}Important Messages - WhatsApp Chatbot{% endblock %}
+
+{% block content %}
+<h2>Important Messages</h2>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Group</th>
+            <th>Sender</th>
+            <th>Content</th>
+            <th>Time</th>
+            <th>Score</th>
+            <th>Keywords</th>
+            <th>Method</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for message in messages %}
+        <tr style="background-color: #ffffcc;">
+            <td>{{ message.whatsapp_group.group_name }}</td>
+            <td>
+                {{ message.sender.name }}<br>
+                <small>({{ message.sender.get_role_display }})</small>
+            </td>
+            <td>{{ message.content|truncatechars:200 }}</td>
+            <td>{{ message.timestamp|date:"M d, H:i" }}</td>
+            <td>{{ message.messageclassification.importance_score|floatformat:2 }}</td>
+            <td>
+                {% if message.messageclassification.detected_keywords %}
+                    {% for keyword in message.messageclassification.detected_keywords %}
+                        <span style="background-color: #ffeb3b; padding: 2px 4px; margin: 1px; border-radius: 3px;">{{ keyword }}</span>
+                    {% endfor %}
+                {% else %}
+                    None
+                {% endif %}
+            </td>
+            <td>{{ message.messageclassification.get_classification_method_display }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">No important messages found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Pagination -->
+{% if messages.has_other_pages %}
+<div class="pagination">
+    {% if messages.has_previous %}
+        <a href="?page={{ messages.previous_page_number }}">&laquo; Previous</a>
+    {% endif %}
+    
+    Page {{ messages.number }} of {{ messages.paginator.num_pages }}
+    
+    {% if messages.has_next %}
+        <a href="?page={{ messages.next_page_number }}">Next &raquo;</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

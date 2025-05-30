@@ -1,0 +1,58 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}Dashboard - WhatsApp Chatbot{% endblock %}
+
+{% block content %}
+<h2>Dashboard</h2>
+
+<div class="stats">
+    <div class="stat-card">
+        <h3>Total Groups</h3>
+        <p>{{ total_groups }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Total Messages</h3>
+        <p>{{ total_messages }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Important Messages</h3>
+        <p>{{ important_messages }}</p>
+    </div>
+</div>
+
+<div class="recent-messages">
+    <h3>Recent Messages</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Group</th>
+                <th>Sender</th>
+                <th>Content</th>
+                <th>Time</th>
+                <th>Important</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in recent_messages %}
+            <tr>
+                <td>{{ message.whatsapp_group.group_name }}</td>
+                <td>{{ message.sender.name }}</td>
+                <td>{{ message.content|truncatechars:50 }}</td>
+                <td>{{ message.timestamp|date:"M d, H:i" }}</td>
+                <td>
+                    {% if message.messageclassification.is_important %}
+                        <strong>YES</strong>
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No messages yet</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

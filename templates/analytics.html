@@ -1,0 +1,102 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}Analytics - WhatsApp Chatbot{% endblock %}
+
+{% block content %}
+<h2>Analytics & Performance</h2>
+
+<div class="date-filter">
+    <form method="get">
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="start_date" value="{{ start_date|date:'Y-m-d' }}">
+        
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date" value="{{ end_date|date:'Y-m-d' }}">
+        
+        <button type="submit">Update</button>
+    </form>
+</div>
+
+<div class="stats">
+    <div class="stat-card">
+        <h3>Total Messages</h3>
+        <p>{{ total_messages }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Important Messages</h3>
+        <p>{{ important_messages }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Accuracy Rate</h3>
+        <p>{{ accuracy_rate }}%</p>
+    </div>
+</div>
+
+<div class="group-statistics">
+    <h3>Group Statistics</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Group</th>
+                <th>Total Messages</th>
+                <th>Important Messages</th>
+                <th>Importance Rate</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in group_stats %}
+            <tr>
+                <td>{{ group.group_name }}</td>
+                <td>{{ group.message_count }}</td>
+                <td>{{ group.important_count }}</td>
+                <td>
+                    {% if group.message_count > 0 %}
+                        {{ group.important_count|mul:100|div:group.message_count|floatformat:1 }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No data available</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="performance-metrics">
+    <h3>Daily Performance Metrics</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Messages Processed</th>
+                <th>Important Detected</th>
+                <th>False Positives</th>
+                <th>False Negatives</th>
+                <th>Accuracy</th>
+                <th>Avg Response Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for metric in performance_metrics %}
+            <tr>
+                <td>{{ metric.date }}</td>
+                <td>{{ metric.messages_processed }}</td>
+                <td>{{ metric.important_messages_detected }}</td>
+                <td>{{ metric.false_positives }}</td>
+                <td>{{ metric.false_negatives }}</td>
+                <td>{{ metric.accuracy_score|floatformat:2 }}</td>
+                <td>{{ metric.response_time_avg|floatformat:2 }}s</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No performance data available</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

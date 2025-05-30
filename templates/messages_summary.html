@@ -1,0 +1,38 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}Message Summary - {{ group.group_name }}{% endblock %}
+
+{% block content %}
+<h2>Message Summary for {{ group.group_name }}</h2>
+
+<div class="summary-options">
+    <a href="?days=1">Last 24 hours</a> | 
+    <a href="?days=7">Last 7 days</a> | 
+    <a href="?days=30">Last 30 days</a>
+</div>
+
+<div class="summary-stats">
+    <div class="stat-card">
+        <h3>Period</h3>
+        <p>{{ start_date }} to {{ end_date }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Total Messages</h3>
+        <p>{{ total_messages }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Important Messages</h3>
+        <p>{{ important_messages }}</p>
+    </div>
+</div>
+
+<div class="summary-content">
+    <h3>Generated Summary</h3>
+    <div style="border: 1px solid #ccc; padding: 15px; background-color: #f9f9f9; white-space: pre-line;">{{ summary_content }}</div>
+</div>
+
+<div class="actions">
+    <button onclick="window.print()">Print Summary</button>
+    <a href="{% url 'chatbot:group_detail' group.id %}">Back to Group</a>
+</div>
+{% endblock %}

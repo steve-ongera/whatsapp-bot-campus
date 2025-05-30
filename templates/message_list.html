@@ -1,0 +1,96 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}Messages - WhatsApp Chatbot{% endblock %}
+
+{% block content %}
+<h2>All Messages</h2>
+
+<div class="filters">
+    <form method="get">
+        <input type="text" name="search" placeholder="Search messages..." value="{{ search_query }}">
+        
+        <select name="group">
+            <option value="">All Groups</option>
+            {% for group in groups %}
+                <option value="{{ group.id }}" {% if request.GET.group == group.id|stringformat:"s" %}selected{% endif %}>
+                    {{ group.group_name }}
+                </option>
+            {% endfor %}
+        </select>
+        
+        <label>
+            <input type="checkbox" name="important" value="true" {% if show_important %}checked{% endif %}>
+            Important only
+        </label>
+        
+        <button type="submit">Filter</button>
+        <a href="{% url 'chatbot:message_list' %}">Clear</a>
+    </form>
+</div>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Group</th>
+            <th>Sender</th>
+            <th>Content</th>
+            <th>Time</th>
+            <th>Type</th>
+            <th>Important</th>
+            <th>Score</th>
+            <th>Keywords</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for message in messages %}
+        <tr {% if message.messageclassification.is_important %}style="background-color: #ffffcc;"{% endif %}>
+            <td>{{ message.whatsapp_group.group_name }}</td>
+            <td>{{ message.sender.name }} ({{ message.sender.get_role_display }})</td>
+            <td>{{ message.content|truncatechars:150 }}</td>
+            <td>{{ message.timestamp|date:"M d, H:i" }}</td>
+            <td>{{ message.get_message_type_display }}</td>
+            <td>
+                {% if message.messageclassification.is_important %}
+                    <strong>YES</strong>
+                {% else %}
+                    No
+                {% endif %}
+            </td>
+            <td>
+                {% if message.messageclassification %}
+                    {{ message.messageclassification.importance_score|floatformat:2 }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
+            <td>
+                {% if message.messageclassification.detected_keywords %}
+                    {{ message.messageclassification.detected_keywords|join:", " }}
+                {% else %}
+                    None
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8">No messages found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Pagination -->
+{% if messages.has_other_pages %}
+<div class="pagination">
+    {% if messages.has_previous %}
+        <a href="?page={{ messages.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}{% if request.GET.important %}&important={{ request.GET.important }}{% endif %}">&laquo; Previous</a>
+    {% endif %}
+    
+    Page {{ messages.number }} of {{ messages.paginator.num_pages }}
+    
+    {% if messages.has_next %}
+        <a href="?page={{ messages.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}{% if request.GET.important %}&important={{ request.GET.important }}{% endif %}">Next &raquo;</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

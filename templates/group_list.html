@@ -1,0 +1,42 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}Groups - WhatsApp Chatbot{% endblock %}
+
+{% block content %}
+<h2>WhatsApp Groups</h2>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Group Name</th>
+            <th>Group ID</th>
+            <th>Type</th>
+            <th>Members</th>
+            <th>Messages</th>
+            <th>Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for group in groups %}
+        <tr>
+            <td>{{ group.group_name }}</td>
+            <td>{{ group.group_id }}</td>
+            <td>{{ group.get_group_type_display }}</td>
+            <td>{{ group.member_count }}</td>
+            <td>{{ group.message_count }}</td>
+            <td>{{ group.created_at|date:"M d, Y" }}</td>
+            <td>
+                <a href="{% url 'chatbot:group_detail' group.id %}">View</a> | 
+                <a href="{% url 'chatbot:bot_configuration' group.id %}">Configure</a> |
+                <a href="{% url 'chatbot:message_summary' group.id %}">Summary</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">No groups found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

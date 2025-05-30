@@ -1,0 +1,35 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}Add Keyword - WhatsApp Chatbot{% endblock %}
+
+{% block content %}
+<h2>Add New Keyword</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <div>
+        <label for="keyword">Keyword:</label>
+        <input type="text" id="keyword" name="keyword" required>
+    </div>
+    
+    <div>
+        <label for="category">Category:</label>
+        <select id="category" name="category" required>
+            <option value="">Select Category</option>
+            {% for value, display in categories %}
+                <option value="{{ value }}">{{ display }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div>
+        <label for="weight">Weight (1-10):</label>
+        <input type="number" id="weight" name="weight" min="1" max="10" value="1" required>
+    </div>
+    
+    <div>
+        <button type="submit">Add Keyword</button>
+        <a href="{% url 'chatbot:keywords_list' %}">Cancel</a>
+    </div>
+</form>
+{% endblock %}

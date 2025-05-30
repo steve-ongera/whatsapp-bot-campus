@@ -1,0 +1,113 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}{{ group.group_name }} - WhatsApp Chatbot{% endblock %}
+
+{% block content %}
+<h2>{{ group.group_name }}</h2>
+
+<div class="group-info">
+    <p><strong>Group ID:</strong> {{ group.group_id }}</p>
+    <p><strong>Type:</strong> {{ group.get_group_type_display }}</p>
+    <p><strong>Created:</strong> {{ group.created_at|date:"M d, Y H:i" }}</p>
+    <p><strong>Active:</strong> {% if group.is_active %}Yes{% else %}No{% endif %}</p>
+</div>
+
+<div class="actions">
+    <a href="{% url 'chatbot:bot_configuration' group.id %}">Configure Bot</a> | 
+    <a href="{% url 'chatbot:message_summary' group.id %}">Generate Summary</a>
+</div>
+
+{% if bot_config %}
+<div class="bot-config">
+    <h3>Bot Configuration</h3>
+    <p>Auto Broadcast: {% if bot_config.auto_broadcast_important %}Enabled{% else %}Disabled{% endif %}</p>
+    <p>Minimum Importance Score: {{ bot_config.minimum_importance_score }}</p>
+    <p>Keyword Detection: {% if bot_config.enable_keyword_detection %}Enabled{% else %}Disabled{% endif %}</p>
+</div>
+{% endif %}
+
+<div class="members">
+    <h3>Group Members ({{ members.count }})</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Joined</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in members %}
+            <tr>
+                <td>{{ member.name }}</td>
+                <td>{{ member.phone_number }}</td>
+                <td>{{ member.get_role_display }}</td>
+                <td>{{ member.joined_at|date:"M d, Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No members found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="messages">
+    <h3>Recent Messages</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Sender</th>
+                <th>Content</th>
+                <th>Time</th>
+                <th>Important</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in messages %}
+            <tr>
+                <td>{{ message.sender.name }}</td>
+                <td>{{ message.content|truncatechars:100 }}</td>
+                <td>{{ message.timestamp|date:"M d, H:i" }}</td>
+                <td>
+                    {% if message.messageclassification.is_important %}
+                        <strong>YES</strong>
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+                <td>
+                    {% if message.messageclassification %}
+                        {{ message.messageclassification.importance_score|floatformat:2 }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No messages found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Pagination -->
+    {% if messages.has_other_pages %}
+    <div class="pagination">
+        {% if messages.has_previous %}
+            <a href="?page={{ messages.previous_page_number }}">&laquo; Previous</a>
+        {% endif %}
+        
+        Page {{ messages.number }} of {{ messages.paginator.num_pages }}
+        
+        {% if messages.has_next %}
+            <a href="?page={{ messages.next_page_number }}">Next &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

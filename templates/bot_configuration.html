@@ -1,0 +1,56 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}Bot Configuration - {{ group.group_name }}{% endblock %}
+
+{% block content %}
+<h2>Bot Configuration for {{ group.group_name }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <div>
+        <label>
+            <input type="checkbox" name="auto_broadcast" {% if config.auto_broadcast_important %}checked{% endif %}>
+            Auto-broadcast important messages
+        </label>
+    </div>
+    
+    <div>
+        <label for="min_score">Minimum Importance Score (0.0 - 1.0):</label>
+        <input type="number" id="min_score" name="min_score" step="0.1" min="0" max="1" value="{{ config.minimum_importance_score }}">
+    </div>
+    
+    <div>
+        <label for="escalation_threshold">Escalation Threshold (0.0 - 1.0):</label>
+        <input type="number" id="escalation_threshold" name="escalation_threshold" step="0.1" min="0" max="1" value="{{ config.escalation_threshold }}">
+    </div>
+    
+    <div>
+        <label>
+            <input type="checkbox" name="keyword_detection" {% if config.enable_keyword_detection %}checked{% endif %}>
+            Enable keyword detection
+        </label>
+    </div>
+    
+    <div>
+        <label>
+            <input type="checkbox" name="sender_priority" {% if config.enable_sender_role_priority %}checked{% endif %}>
+            Enable sender role priority
+        </label>
+    </div>
+    
+    <div>
+        <label for="delay_minutes">Notification delay (minutes):</label>
+        <input type="number" id="delay_minutes" name="delay_minutes" min="0" value="{{ config.notification_delay_minutes }}">
+    </div>
+    
+    <div>
+        <label for="max_messages">Max messages per hour:</label>
+        <input type="number" id="max_messages" name="max_messages" min="1" value="{{ config.max_messages_per_hour }}">
+    </div>
+    
+    <div>
+        <button type="submit">Save Configuration</button>
+        <a href="{% url 'chatbot:group_detail' group.id %}">Cancel</a>
+    </div>
+</form>
+{% endblock %}
