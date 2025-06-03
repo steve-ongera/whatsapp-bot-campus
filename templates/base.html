@@ -3,40 +3,350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}WhatsApp Chatbot{% endblock %}</title>
+    <title>{% block title %}WhatsApp BOt{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --whatsapp-primary: #075e54;
+            --whatsapp-secondary: #128c7e;
+            --whatsapp-light: #25d366;
+            --whatsapp-bg: #e5ddd5;
+            --whatsapp-chat-bg: #dcf8c6;
+            --sidebar-width: 280px;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            overflow-x: hidden;
+        }
+        
+        /* Sidebar styling */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: linear-gradient(to bottom, var(--whatsapp-primary), var(--whatsapp-secondary));
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header h3 {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .sidebar-header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            margin-bottom: 0;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 5px 0;
+            border-radius: 0 30px 30px 0;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main content area */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+        
+        /* Top navbar */
+        .top-navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        
+        .user-dropdown img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        /* Content area */
+        .content-wrapper {
+            padding: 20px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: white;
+            padding: 15px 20px;
+            margin-left: var(--sidebar-width);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Alerts/messages */
+        .alert {
+            border-radius: 8px;
+            padding: 12px 15px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content, .footer {
+                margin-left: 0;
+            }
+            
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                display: none;
+            }
+            
+            .sidebar-overlay.show {
+                display: block;
+            }
+        }
+        
+        /* WhatsApp theme elements */
+        .whatsapp-bg {
+            background-color: var(--whatsapp-bg);
+        }
+        
+        .whatsapp-primary-bg {
+            background-color: var(--whatsapp-primary);
+        }
+        
+        .whatsapp-secondary-bg {
+            background-color: var(--whatsapp-secondary);
+        }
+        
+        .whatsapp-light-bg {
+            background-color: var(--whatsapp-light);
+        }
+        
+        .btn-whatsapp {
+            background-color: var(--whatsapp-light);
+            color: white;
+            border: none;
+        }
+        
+        .btn-whatsapp:hover {
+            background-color: #1da851;
+            color: white;
+        }
+        
+        /* Badge */
+        .badge-whatsapp {
+            background-color: var(--whatsapp-light);
+            color: white;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header>
-        <nav>
-            <h1>WhatsApp Smart Bot</h1>
-            <ul>
-                <li><a href="{% url 'chatbot:dashboard' %}">Dashboard</a></li>
-                <li><a href="{% url 'chatbot:group_list' %}">Groups</a></li>
-                <li><a href="{% url 'chatbot:message_list' %}">Messages</a></li>
-                <li><a href="{% url 'chatbot:important_messages' %}">Important Messages</a></li>
-                <li><a href="{% url 'chatbot:keywords_list' %}">Keywords</a></li>
-                <li><a href="{% url 'chatbot:analytics' %}">Analytics</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main>
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fab fa-whatsapp"></i> WhatsApp Admin</h3>
+            <p>Smart Bot Management</p>
+        </div>
+        
+        <ul class="nav flex-column mt-4">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'chatbot:dashboard' %}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'group_list' %}active{% endif %}" href="{% url 'chatbot:group_list' %}">
+                    <i class="fas fa-users"></i> Groups
+                    <span class="badge badge-whatsapp float-end mt-1">5</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'message_list' %}active{% endif %}" href="{% url 'chatbot:message_list' %}">
+                    <i class="fas fa-comments"></i> Messages
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'important_messages' %}active{% endif %}" href="{% url 'chatbot:important_messages' %}">
+                    <i class="fas fa-star"></i> Important
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'keywords_list' %}active{% endif %}" href="{% url 'chatbot:keywords_list' %}">
+                    <i class="fas fa-key"></i> Keywords
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}" href="{% url 'chatbot:analytics' %}">
+                    <i class="fas fa-chart-line"></i> Analytics
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-question-circle"></i> Help
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Sidebar overlay (mobile only) -->
+    <div class="sidebar-overlay"></div>
+    
+    <!-- Main content -->
+    <div class="main-content">
+        <!-- Top navbar -->
+        <nav class="top-navbar navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <button class="btn d-lg-none" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="d-flex align-items-center ms-auto">
+                    <div class="dropdown">
+                        <a class="btn dropdown-toggle d-flex align-items-center user-dropdown" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://via.placeholder.com/40" alt="User profile">
+                            <span>Admin User</span>
+                        </a>
+                        
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
                     </div>
-                {% endfor %}
+                </div>
             </div>
-        {% endif %}
+        </nav>
+        
+        <!-- Content wrapper -->
+        <div class="content-wrapper">
+            {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% block content %}
+            <!-- Main content will be inserted here -->
+            {% endblock %}
+        </div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="mb-0">&copy; 2024 WhatsApp Smart Bot - University Project</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <p class="mb-0">v1.0.0</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
 
-        {% block content %}
-        {% endblock %}
-    </main>
-
-    <footer>
-        <p>&copy; 2024 WhatsApp Smart Bot - University Project</p>
-    </footer>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Toggle sidebar on mobile
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('show');
+            document.querySelector('.sidebar-overlay').classList.toggle('show');
+        });
+        
+        // Close sidebar when clicking on overlay
+        document.querySelector('.sidebar-overlay').addEventListener('click', function() {
+            this.classList.remove('show');
+            document.querySelector('.sidebar').classList.remove('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                var dropdowns = document.querySelectorAll('.dropdown-menu');
+                dropdowns.forEach(function(dropdown) {
+                    dropdown.classList.remove('show');
+                });
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

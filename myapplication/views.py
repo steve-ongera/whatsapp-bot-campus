@@ -28,13 +28,14 @@ def dashboard(request):
     return render(request, 'chatbot/dashboard.html', context)
 
 
+
 def group_list(request):
     """List all WhatsApp groups"""
     groups = WhatsAppGroup.objects.filter(is_active=True).annotate(
         member_count=Count('groupmember'),
         message_count=Count('message')
     )
-    return render(request, 'chatbot/group_list.html', {'groups': groups})
+    return render(request, 'group_list.html', {'groups': groups})
 
 
 def group_detail(request, group_id):
@@ -63,7 +64,7 @@ def group_detail(request, group_id):
         'messages': messages,
         'bot_config': bot_config
     }
-    return render(request, 'chatbot/group_detail.html', context)
+    return render(request, 'group_detail.html', context)
 
 
 def message_list(request):
@@ -94,7 +95,7 @@ def message_list(request):
         'search_query': search_query or '',
         'show_important': request.GET.get('important') == 'true'
     }
-    return render(request, 'chatbot/message_list.html', context)
+    return render(request, 'message_list.html', context)
 
 
 def important_messages(request):
@@ -107,13 +108,13 @@ def important_messages(request):
     page_number = request.GET.get('page')
     messages = paginator.get_page(page_number)
     
-    return render(request, 'chatbot/important_messages.html', {'messages': messages})
+    return render(request, 'important_messages.html', {'messages': messages})
 
 
 def keywords_list(request):
     """List and manage important keywords"""
     keywords = ImportantKeyword.objects.filter(is_active=True).order_by('category', 'keyword')
-    return render(request, 'chatbot/keywords_list.html', {'keywords': keywords})
+    return render(request, 'keywords_list.html', {'keywords': keywords})
 
 
 def add_keyword(request):
@@ -135,7 +136,7 @@ def add_keyword(request):
         return redirect('keywords_list')
     
     categories = ImportantKeyword._meta.get_field('category').choices
-    return render(request, 'chatbot/add_keyword.html', {'categories': categories})
+    return render(request, 'add_keyword.html', {'categories': categories})
 
 
 def bot_configuration(request, group_id):
