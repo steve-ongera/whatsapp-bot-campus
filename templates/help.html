@@ -1,0 +1,736 @@
+{% extends "base.html" %}
+
+{% block title %}WhatsApp Bot Help Center{% endblock %}
+
+{% block content %}
+<div class="documentation-container">
+    <div class="docs-header">
+        <h1><i class="fas fa-question-circle"></i> WhatsApp Bot Help Center</h1>
+        <p class="subtitle">Comprehensive documentation for your intelligent messaging system</p>
+    </div>
+
+    <div class="docs-content">
+        <div class="row">
+            <div class="col-md-3 docs-sidebar">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column docs-nav">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#overview">Overview</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#getting-started">Getting Started</a>
+                            <ul class="sub-menu">
+                                <li><a href="#installation">Installation</a></li>
+                                <li><a href="#configuration">Configuration</a></li>
+                                <li><a href="#first-run">First Run</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#features">Features</a>
+                            <ul class="sub-menu">
+                                <li><a href="#message-classification">Message Classification</a></li>
+                                <li><a href="#smart-broadcasting">Smart Broadcasting</a></li>
+                                <li><a href="#multi-group">Multi-Group Support</a></li>
+                                <li><a href="#analytics">Analytics</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#configuration-guide">Configuration Guide</a>
+                            <ul class="sub-menu">
+                                <li><a href="#group-settings">Group Settings</a></li>
+                                <li><a href="#keyword-management">Keyword Management</a></li>
+                                <li><a href="#response-templates">Response Templates</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#troubleshooting">Troubleshooting</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#faq">FAQ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#api-reference">API Reference</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-9 docs-main">
+                <!-- Overview Section -->
+                <section id="overview" class="docs-section">
+                    <h2 class="section-title">Overview</h2>
+                    <div class="section-content">
+                        <p>The WhatsApp Bot Application is an intelligent message classification and automated response system designed for educational institutions and organizations. It helps manage group communications by:</p>
+                        <ul>
+                            <li>Automatically classifying message importance</li>
+                            <li>Prioritizing messages from key roles (teachers, admins)</li>
+                            <li>Providing automated responses and summaries</li>
+                            <li>Generating comprehensive analytics</li>
+                        </ul>
+                        <div class="alert alert-info">
+                            <strong>System Requirements:</strong> Python 3.8+, Django 4.0+, PostgreSQL/MySQL recommended for production
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Getting Started Section -->
+                <section id="getting-started" class="docs-section">
+                    <h2 class="section-title">Getting Started</h2>
+                    
+                    <article id="installation" class="subsection">
+                        <h3>Installation</h3>
+                        <div class="subsection-content">
+                            <p>Follow these steps to install the WhatsApp Bot Application:</p>
+                            <ol>
+                                <li>Clone the repository:
+                                    <pre><code class="language-bash">git clone &lt;repository-url&gt;
+cd whatsapp-bot-application</code></pre>
+                                </li>
+                                <li>Create virtual environment:
+                                    <pre><code class="language-bash">python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate</code></pre>
+                                </li>
+                                <li>Install dependencies:
+                                    <pre><code class="language-bash">pip install -r requirements.txt</code></pre>
+                                </li>
+                            </ol>
+                        </div>
+                    </article>
+
+                    <article id="configuration" class="subsection">
+                        <h3>Configuration</h3>
+                        <div class="subsection-content">
+                            <p>Configure your database in <code>settings.py</code>:</p>
+                            <pre><code class="language-python">DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'whatsapp_bot_db',
+        'USER': 'your_username',
+        'PASSWORD': 'your_password',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}</code></pre>
+                            <p>Create a <code>.env</code> file with these variables:</p>
+                            <pre><code class="language-env">SECRET_KEY=your_django_secret_key
+DEBUG=True
+DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+WHATSAPP_API_KEY=your_whatsapp_api_key</code></pre>
+                        </div>
+                    </article>
+
+                    <article id="first-run" class="subsection">
+                        <h3>First Run</h3>
+                        <div class="subsection-content">
+                            <ol>
+                                <li>Run migrations:
+                                    <pre><code class="language-bash">python manage.py makemigrations
+python manage.py migrate</code></pre>
+                                </li>
+                                <li>Create superuser:
+                                    <pre><code class="language-bash">python manage.py createsuperuser</code></pre>
+                                </li>
+                                <li>Start development server:
+                                    <pre><code class="language-bash">python manage.py runserver</code></pre>
+                                </li>
+                            </ol>
+                        </div>
+                    </article>
+                </section>
+
+                <!-- Features Section -->
+                <section id="features" class="docs-section">
+                    <h2 class="section-title">Features</h2>
+                    
+                    <article id="message-classification" class="subsection">
+                        <h3>Message Classification</h3>
+                        <div class="subsection-content">
+                            <p>The bot classifies messages using multiple methods:</p>
+                            <table class="table feature-table">
+                                <thead>
+                                    <tr>
+                                        <th>Method</th>
+                                        <th>Description</th>
+                                        <th>Configuration</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Keyword Detection</td>
+                                        <td>Identifies predefined important keywords</td>
+                                        <td>Configure in Keywords tab</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sender Role</td>
+                                        <td>Prioritizes messages from teachers/admins</td>
+                                        <td>Set in Group Members</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ML Classification</td>
+                                        <td>Machine learning model (if enabled)</td>
+                                        <td>Requires additional setup</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </article>
+
+                    <article id="smart-broadcasting" class="subsection">
+                        <h3>Smart Broadcasting</h3>
+                        <div class="subsection-content">
+                            <p>The system automatically broadcasts important messages based on:</p>
+                            <ul>
+                                <li>Importance score threshold (configurable)</li>
+                                <li>Message category (exam, assignment, etc.)</li>
+                                <li>Recipient roles (students, teachers, etc.)</li>
+                            </ul>
+                            <div class="alert alert-warning">
+                                <strong>Note:</strong> Configure broadcast settings in General Settings tab
+                            </div>
+                        </div>
+                    </article>
+
+                    <article id="multi-group" class="subsection">
+                        <h3>Multi-Group Support</h3>
+                        <div class="subsection-content">
+                            <p>Manage multiple WhatsApp groups with different configurations:</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card feature-card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Group Types</h5>
+                                            <ul>
+                                                <li>Class Group</li>
+                                                <li>Study Group</li>
+                                                <li>General Group</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card feature-card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Per-Group Settings</h5>
+                                            <ul>
+                                                <li>Custom keywords</li>
+                                                <li>Different thresholds</li>
+                                                <li>Unique response templates</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article id="analytics" class="subsection">
+                        <h3>Analytics</h3>
+                        <div class="subsection-content">
+                            <p>Comprehensive metrics and reporting:</p>
+                            <div class="metrics-grid">
+                                <div class="metric-item">
+                                    <div class="metric-value">95%</div>
+                                    <div class="metric-label">Classification Accuracy</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-value">2.3s</div>
+                                    <div class="metric-label">Avg Response Time</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-value">87%</div>
+                                    <div class="metric-label">User Satisfaction</div>
+                                </div>
+                            </div>
+                            <p>Generate reports for:</p>
+                            <ul>
+                                <li>Daily/weekly summaries</li>
+                                <li>Keyword effectiveness</li>
+                                <li>User engagement</li>
+                                <li>Performance trends</li>
+                            </ul>
+                        </div>
+                    </article>
+                </section>
+
+                <!-- Configuration Guide Section -->
+                <section id="configuration-guide" class="docs-section">
+                    <h2 class="section-title">Configuration Guide</h2>
+                    
+                    <article id="group-settings" class="subsection">
+                        <h3>Group Settings</h3>
+                        <div class="subsection-content">
+                            <p>Configure each WhatsApp group individually:</p>
+                            <ol>
+                                <li>Navigate to Groups tab in Settings</li>
+                                <li>Click "Add New Group" or edit existing group</li>
+                                <li>Set group parameters:
+                                    <ul>
+                                        <li><strong>Group Name:</strong> Descriptive name</li>
+                                        <li><strong>Group Type:</strong> Class/Study/General</li>
+                                        <li><strong>Group ID:</strong> WhatsApp identifier</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                            <img src="/static/images/group-settings.png" alt="Group Settings Screenshot" class="img-fluid doc-image">
+                        </div>
+                    </article>
+
+                    <article id="keyword-management" class="subsection">
+                        <h3>Keyword Management</h3>
+                        <div class="subsection-content">
+                            <p>Add important keywords with weights (1-10 scale):</p>
+                            <pre><code class="language-python"># Example keyword creation
+ImportantKeyword.objects.create(
+    keyword="urgent assignment",
+    category="assignment",
+    weight=9
+)</code></pre>
+                            <p>Categories available:</p>
+                            <div class="keyword-categories">
+                                
+                                <span class="badge badge-category">Programming Java </span>
+                                
+                            </div>
+                        </div>
+                    </article>
+
+                    <article id="response-templates" class="subsection">
+                        <h3>Response Templates</h3>
+                        <div class="subsection-content">
+                            <p>Customize automated responses with variables:</p>
+                            <table class="table template-vars">
+                                <thead>
+                                    <tr>
+                                        <th>Variable</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>{message}</code></td>
+                                        <td>Original message content</td>
+                                        <td>"Exam scheduled for Friday"</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>{user_name}</code></td>
+                                        <td>Sender's name</td>
+                                        <td>"John Doe"</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>{group_name}</code></td>
+                                        <td>Group name</td>
+                                        <td>"CS101 Class Group"</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </article>
+                </section>
+
+                <!-- Troubleshooting Section -->
+                <section id="troubleshooting" class="docs-section">
+                    <h2 class="section-title">Troubleshooting</h2>
+                    <div class="section-content">
+                        <div class="card troubleshooting-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Common Issues</h5>
+                                <div class="accordion" id="troubleshootingAccordion">
+                                    <div class="card">
+                                        <div class="card-header" id="headingOne">
+                                            <h5 class="mb-0">
+                                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne">
+                                                    Messages not being classified
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="collapseOne" class="collapse show">
+                                            <div class="card-body">
+                                                <ol>
+                                                    <li>Check keyword configuration</li>
+                                                    <li>Verify bot is active in General Settings</li>
+                                                    <li>Review classification thresholds</li>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-header" id="headingTwo">
+                                            <h5 class="mb-0">
+                                                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo">
+                                                    High false positive rate
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div id="collapseTwo" class="collapse">
+                                            <div class="card-body">
+                                                <ul>
+                                                    <li>Adjust minimum importance score</li>
+                                                    <li>Review and refine keywords</li>
+                                                    <li>Update keyword weights</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- FAQ Section -->
+                <section id="faq" class="docs-section">
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                    <div class="section-content">
+                        <div class="faq-list">
+                            <div class="faq-item">
+                                <h5>How do I add a new WhatsApp group?</h5>
+                                <p>Navigate to Settings → Groups tab and click "Add New Group". Provide the group name, type, and WhatsApp group ID.</p>
+                            </div>
+                            <div class="faq-item">
+                                <h5>Can I use different keywords for different groups?</h5>
+                                <p>Yes, keywords can be configured per group. When adding a keyword, select which groups it should apply to.</p>
+                            </div>
+                            <div class="faq-item">
+                                <h5>How often are analytics generated?</h5>
+                                <p>By default, daily summaries are generated at midnight. Weekly reports are generated every Sunday. This can be configured in Analytics Settings.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- API Reference Section -->
+                <section id="api-reference" class="docs-section">
+                    <h2 class="section-title">API Reference</h2>
+                    <div class="section-content">
+                        <div class="api-endpoints">
+                            <div class="endpoint-card">
+                                <div class="endpoint-header">
+                                    <span class="badge badge-get">GET</span>
+                                    <code>/api/groups/</code>
+                                </div>
+                                <div class="endpoint-body">
+                                    <p>List all configured WhatsApp groups</p>
+                                    <pre><code class="language-json">{
+    "groups": [
+        {
+            "id": 1,
+            "name": "CS101 Class Group",
+            "type": "class"
+        }
+    ]
+}</code></pre>
+                                </div>
+                            </div>
+                            <div class="endpoint-card">
+                                <div class="endpoint-header">
+                                    <span class="badge badge-post">POST</span>
+                                    <code>/api/classify/</code>
+                                </div>
+                                <div class="endpoint-body">
+                                    <p>Manually classify a message</p>
+                                    <pre><code class="language-json">{
+    "message": "Exam next week",
+    "sender": "+1234567890",
+    "group_id": 1
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .documentation-container {
+        background-color: #f8f9fa;
+        padding: 20px;
+    }
+
+    .docs-header {
+        background-color: #075e54;
+        color: white;
+        padding: 30px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    .docs-header h1 {
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .docs-header .subtitle {
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+
+    .docs-sidebar {
+        position: sticky;
+        top: 20px;
+        height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+
+    .docs-nav {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .docs-nav .nav-link {
+        color: #333;
+        padding: 8px 15px;
+        border-left: 3px solid transparent;
+        font-weight: 500;
+    }
+
+    .docs-nav .nav-link.active {
+        color: #075e54;
+        border-left: 3px solid #075e54;
+        background-color: rgba(7, 94, 84, 0.05);
+    }
+
+    .docs-nav .nav-link:hover:not(.active) {
+        color: #128c7e;
+    }
+
+    .docs-nav .sub-menu {
+        list-style: none;
+        padding-left: 15px;
+        margin-top: 5px;
+    }
+
+    .docs-nav .sub-menu a {
+        display: block;
+        padding: 5px 10px;
+        color: #555;
+        font-size: 0.9rem;
+        font-weight: 400;
+    }
+
+    .docs-nav .sub-menu a:hover {
+        color: #075e54;
+    }
+
+    .docs-main {
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .docs-section {
+        margin-bottom: 50px;
+    }
+
+    .section-title {
+        color: #075e54;
+        border-bottom: 2px solid #f0f2f5;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    .subsection {
+        margin-bottom: 30px;
+    }
+
+    .subsection h3 {
+        color: #333;
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+    }
+
+    pre {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 4px solid #075e54;
+    }
+
+    code {
+        color: #d63384;
+        background-color: rgba(214, 51, 132, 0.05);
+        padding: 2px 4px;
+        border-radius: 3px;
+    }
+
+    .alert {
+        border-left: 4px solid;
+    }
+
+    .alert-info {
+        border-color: #17a2b8;
+    }
+
+    .alert-warning {
+        border-color: #ffc107;
+    }
+
+    .feature-table {
+        margin: 20px 0;
+    }
+
+    .feature-table th {
+        background-color: #f0f2f5;
+    }
+
+    .feature-card {
+        height: 100%;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .metric-item {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .metric-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #075e54;
+    }
+
+    .metric-label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .doc-image {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin: 15px 0;
+        max-width: 100%;
+    }
+
+    .keyword-categories {
+        margin: 15px 0;
+    }
+
+    .badge-category {
+        background-color: #25D366;
+        color: white;
+        margin-right: 5px;
+        font-weight: normal;
+    }
+
+    .template-vars {
+        margin: 20px 0;
+    }
+
+    .template-vars code {
+        color: #075e54;
+        background-color: rgba(7, 94, 84, 0.1);
+    }
+
+    .troubleshooting-card {
+        border: none;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .faq-item {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f0f2f5;
+    }
+
+    .faq-item h5 {
+        color: #075e54;
+    }
+
+    .endpoint-card {
+        border: 1px solid #f0f2f5;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .endpoint-header {
+        background-color: #f8f9fa;
+        padding: 10px 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .endpoint-header code {
+        margin-left: 10px;
+        background: none;
+        color: #333;
+        padding: 0;
+    }
+
+    .endpoint-body {
+        padding: 15px;
+    }
+
+    .badge-get {
+        background-color: #28a745;
+    }
+
+    .badge-post {
+        background-color: #17a2b8;
+    }
+
+    @media (max-width: 768px) {
+        .docs-sidebar {
+            position: static;
+            height: auto;
+            margin-bottom: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Smooth scrolling for anchor links
+        $('a[href^="#"]').on('click', function(event) {
+            var target = $(this.getAttribute('href'));
+            if(target.length) {
+                event.preventDefault();
+                $('html, body').stop().animate({
+                    scrollTop: target.offset().top - 20
+                }, 1000);
+            }
+        });
+
+        // Highlight active section in sidebar
+        $(window).scroll(function() {
+            var scrollPosition = $(window).scrollTop();
+            
+            $('.docs-section').each(function() {
+                var currentSection = $(this);
+                var sectionTop = currentSection.offset().top - 50;
+                var sectionBottom = sectionTop + currentSection.outerHeight();
+                
+                if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                    var sectionId = currentSection.attr('id');
+                    $('.docs-nav a').removeClass('active');
+                    $('.docs-nav a[href="#' + sectionId + '"]').addClass('active');
+                }
+            });
+        });
+
+        // Initialize code highlighting
+        $('pre code').each(function(i, block) {
+            hljs.highlightBlock(block);
+        });
+    });
+</script>
+{% endblock %}

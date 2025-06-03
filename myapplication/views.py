@@ -352,3 +352,10 @@ def message_summary(request, group_id):
     }
     
     return render(request, 'message_summary.html', context)
+
+
+def settings_view(request):
+    return render(request, 'settings.html')
+
+def help_view(request):
+    return render(request, 'help.html')

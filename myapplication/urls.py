@@ -26,4 +26,7 @@ urlpatterns = [
     
     # API endpoint for WhatsApp webhook
     path('webhook/', views.webhook, name='webhook'),
+
+    path('settings/', views.settings_view, name='settings'),
+    path('help/', views.help_view, name='help'),
 ]

@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+
+{% block title %}WhatsApp Bot Settings{% endblock %}
+
+{% block content %}
+<div class="whatsapp-settings-container">
+    <div class="settings-header">
+        <h1><i class="fab fa-whatsapp"></i> WhatsApp Bot Settings</h1>
+        <p class="subtitle">Configure your intelligent message classification system</p>
+    </div>
+
+    <div class="settings-content">
+        <div class="settings-tabs">
+            <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab">General</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="keywords-tab" data-toggle="tab" href="#keywords" role="tab">Keywords</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="groups-tab" data-toggle="tab" href="#groups" role="tab">Groups</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="responses-tab" data-toggle="tab" href="#responses" role="tab">Responses</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="analytics-tab" data-toggle="tab" href="#analytics" role="tab">Analytics</a>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="settingsTabsContent">
+                <!-- General Settings Tab -->
+                <div class="tab-pane fade show active" id="general" role="tabpanel">
+                    <form class="settings-form">
+                        <div class="form-group">
+                            <label for="botStatus">Bot Status</label>
+                            <select class="form-control" id="botStatus">
+                                <option>Active</option>
+                                <option>Inactive</option>
+                                <option>Maintenance Mode</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="autoBroadcast">Auto Broadcast Important Messages</label>
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="autoBroadcast" checked>
+                                <label class="custom-control-label" for="autoBroadcast">Enabled</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="importanceThreshold">Minimum Importance Score (0-1)</label>
+                            <input type="number" class="form-control" id="importanceThreshold" min="0" max="1" step="0.1" value="0.7">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rateLimit">Rate Limit (messages/hour)</label>
+                            <input type="number" class="form-control" id="rateLimit" min="1" max="100" value="50">
+                        </div>
+
+                        <button type="submit" class="btn btn-whatsapp">Save General Settings</button>
+                    </form>
+                </div>
+
+                <!-- Keywords Settings Tab -->
+                <div class="tab-pane fade" id="keywords" role="tabpanel">
+                    <div class="keyword-management">
+                        <div class="add-keyword-form">
+                            <h4>Add New Keyword</h4>
+                            <form class="form-inline">
+                                <div class="form-group mr-2">
+                                    <input type="text" class="form-control" placeholder="Keyword" required>
+                                </div>
+                                <div class="form-group mr-2">
+                                    <select class="form-control">
+                                        <option>Schedule</option>
+                                        <option>Assignment</option>
+                                        <option>Exam</option>
+                                        <option>Deadline</option>
+                                        <option>Meeting</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mr-2">
+                                    <select class="form-control">
+                                        <option>1 - Low</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option selected>4 - Medium</option>
+                                        <option>5</option>
+                                        <option>6</option>
+                                        <option>7</option>
+                                        <option>8 - High</option>
+                                        <option>9</option>
+                                <option>10 - Critical</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-whatsapp">Add</button>
+                            </form>
+                        </div>
+
+                        <div class="keyword-list mt-4">
+                            <h4>Current Keywords</h4>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Keyword</th>
+                                            <th>Category</th>
+                                            <th>Weight</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>exam</td>
+                                            <td>Exam</td>
+                                            <td>8</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-warning">Edit</button>
+                                                <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>deadline</td>
+                                            <td>Deadline</td>
+                                            <td>9</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-warning">Edit</button>
+                                                <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>assignment</td>
+                                            <td>Assignment</td>
+                                            <td>7</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-warning">Edit</button>
+                                                <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Groups Settings Tab -->
+                <div class="tab-pane fade" id="groups" role="tabpanel">
+                    <div class="group-management">
+                        <div class="add-group-form mb-4">
+                            <button class="btn btn-whatsapp" data-toggle="modal" data-target="#addGroupModal">
+                                <i class="fas fa-plus"></i> Add New Group
+                            </button>
+                        </div>
+
+                        <div class="group-list">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action active">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">Computer Science 2023</h5>
+                                        <small>Class Group</small>
+                                    </div>
+                                    <p class="mb-1">42 members, 15 active today</p>
+                                    <small>Last message: 2 hours ago</small>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">Mathematics Study Group</h5>
+                                        <small>Study Group</small>
+                                    </div>
+                                    <p class="mb-1">23 members, 8 active today</p>
+                                    <small>Last message: 30 minutes ago</small>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">University Announcements</h5>
+                                        <small>General Group</small>
+                                    </div>
+                                    <p class="mb-1">156 members, 45 active today</p>
+                                    <small>Last message: 1 hour ago</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Responses Settings Tab -->
+                <div class="tab-pane fade" id="responses" role="tabpanel">
+                    <div class="response-templates">
+                        <div class="form-group">
+                            <label for="broadcastTemplate">Broadcast Template</label>
+                            <textarea class="form-control" id="broadcastTemplate" rows="3">🚨 Important Message: "{message}"\n\nThis message has been flagged as important by the system.</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="directResponseTemplate">Direct Response Template</label>
+                            <textarea class="form-control" id="directResponseTemplate" rows="3">Hello {user_name},\n\nRegarding your message: "{message}"\n\nOur automated system has identified this as important and will ensure it reaches the right people.</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="summaryTemplate">Daily Summary Template</label>
+                            <textarea class="form-control" id="summaryTemplate" rows="5">📅 Daily Summary for {date}\n\nImportant Messages:\n{important_messages}\n\nTotal Messages: {total_count}\nImportant Messages: {important_count}\n\nHave a great day!</textarea>
+                        </div>
+
+                        <button class="btn btn-whatsapp">Save Response Templates</button>
+                    </div>
+                </div>
+
+                <!-- Analytics Settings Tab -->
+                <div class="tab-pane fade" id="analytics" role="tabpanel">
+                    <div class="analytics-settings">
+                        <div class="form-group">
+                            <label for="metricsFrequency">Metrics Collection Frequency</label>
+                            <select class="form-control" id="metricsFrequency">
+                                <option>Real-time</option>
+                                <option selected>Every 15 minutes</option>
+                                <option>Hourly</option>
+                                <option>Daily</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reportSchedule">Report Generation Schedule</label>
+                            <select class="form-control" id="reportSchedule">
+                                <option>Daily</option>
+                                <option selected>Weekly</option>
+                                <option>Monthly</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Data Retention</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="retention" id="retention30" checked>
+                                <label class="form-check-label" for="retention30">
+                                    30 days
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="retention" id="retention90">
+                                <label class="form-check-label" for="retention90">
+                                    90 days
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="retention" id="retention365">
+                                <label class="form-check-label" for="retention365">
+                                    1 year
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-whatsapp">Save Analytics Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Group Modal -->
+<div class="modal fade" id="addGroupModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New WhatsApp Group</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="groupName">Group Name</label>
+                        <input type="text" class="form-control" id="groupName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="groupType">Group Type</label>
+                        <select class="form-control" id="groupType" required>
+                            <option>Class Group</option>
+                            <option>Study Group</option>
+                            <option>General Group</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="groupID">WhatsApp Group ID</label>
+                        <input type="text" class="form-control" id="groupID" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-whatsapp">Add Group</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .whatsapp-settings-container {
+        background-color: #f0f2f5;
+        padding: 20px;
+        border-radius: 10px;
+        min-height: calc(100vh - 100px);
+    }
+
+    .settings-header {
+        background-color: #075e54;
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .settings-header h1 {
+        margin-bottom: 5px;
+    }
+
+    .settings-header .subtitle {
+        opacity: 0.9;
+        font-size: 0.9rem;
+    }
+
+    .settings-content {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .nav-tabs {
+        border-bottom: 2px solid #075e54;
+    }
+
+    .nav-tabs .nav-link {
+        color: #555;
+        border: none;
+        padding: 10px 20px;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #075e54;
+        background-color: white;
+        border-bottom: 3px solid #075e54;
+        font-weight: bold;
+    }
+
+    .nav-tabs .nav-link:hover:not(.active) {
+        color: #075e54;
+        border-bottom: 3px solid rgba(7, 94, 84, 0.3);
+    }
+
+    .settings-form {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .btn-whatsapp {
+        background-color: #075e54;
+        color: white;
+    }
+
+    .btn-whatsapp:hover {
+        background-color: #128c7e;
+        color: white;
+    }
+
+    .keyword-list {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+    }
+
+    .list-group-item.active {
+        background-color: #075e54;
+        border-color: #075e54;
+    }
+
+    .fab.fa-whatsapp {
+        font-size: 1.2em;
+        margin-right: 10px;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        // Initialize tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+
+        // Tab persistence
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+            localStorage.setItem('lastSettingsTab', $(e.target).attr('href'));
+        });
+
+        var lastTab = localStorage.getItem('lastSettingsTab');
+        if (lastTab) {
+            $('[href="' + lastTab + '"]').tab('show');
+        }
+    });
+</script>
+{% endblock %}
