@@ -1,53 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}Keywords - WhatsApp Chatbot{% endblock %}
-
-{% block content %}
-<div class="whatsapp-keywords-container">
-    <div class="whatsapp-keywords-header">
-        <h2><i class="fas fa-key"></i> Important Keywords Management</h2>
-        <div class="actions">
-            <a href="{% url 'chatbot:add_keyword' %}" class="btn btn-success">
-                <i class="fas fa-plus"></i> Add New Keyword
-            </a>
-        </div>
-    </div>
-
-    <div class="whatsapp-keywords-table-container">
-        <table class="whatsapp-keywords-table">
-            <thead>
-                <tr>
-                    <th><i class="fas fa-font"></i> Keyword</th>
-                    <th><i class="fas fa-tag"></i> Category</th>
-                    <th><i class="fas fa-weight-hanging"></i> Weight</th>
-                    <th><i class="fas fa-calendar-alt"></i> Created</th>
-                    <th><i class="fas fa-circle"></i> Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for keyword in keywords %}
-                <tr>
-                    <td>{{ keyword.keyword }}</td>
-                    <td>{{ keyword.get_category_display }}</td>
-                    <td>{{ keyword.weight }}</td>
-                    <td>{{ keyword.created_at|date:"M d, Y" }}</td>
-                    <td>
-                        <span class="status-badge {% if keyword.is_active %}active{% else %}inactive{% endif %}">
-                            {% if keyword.is_active %}Active{% else %}Inactive{% endif %}
-                        </span>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr class="empty-row">
-                    <td colspan="5">
-                        <i class="fas fa-info-circle"></i> No keywords found
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+{% block extra_css %}
 
 <style>
 .whatsapp-keywords-container {
@@ -173,4 +127,54 @@
     }
 }
 </style>
+
+{% endblock %}
+
+{% block content %}
+<div class="whatsapp-keywords-container">
+    <div class="whatsapp-keywords-header">
+        <h2><i class="fas fa-key"></i> Important Keywords Management</h2>
+        <div class="actions">
+            <a href="{% url 'chatbot:add_keyword' %}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Add New Keyword
+            </a>
+        </div>
+    </div>
+
+    <div class="whatsapp-keywords-table-container">
+        <table class="whatsapp-keywords-table">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-font"></i> Keyword</th>
+                    <th><i class="fas fa-tag"></i> Category</th>
+                    <th><i class="fas fa-weight-hanging"></i> Weight</th>
+                    <th><i class="fas fa-calendar-alt"></i> Created</th>
+                    <th><i class="fas fa-circle"></i> Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for keyword in keywords %}
+                <tr>
+                    <td>{{ keyword.keyword }}</td>
+                    <td>{{ keyword.get_category_display }}</td>
+                    <td>{{ keyword.weight }}</td>
+                    <td>{{ keyword.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <span class="status-badge {% if keyword.is_active %}active{% else %}inactive{% endif %}">
+                            {% if keyword.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr class="empty-row">
+                    <td colspan="5">
+                        <i class="fas fa-info-circle"></i> No keywords found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 {% endblock %}

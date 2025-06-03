@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+
+{% block title %}Important Messages - WhatsApp Chatbot{% endblock %}
+
+{% block content %}
+<div class="whatsapp-messages-container">
+    <div class="whatsapp-messages-header">
+        <h2><i class="fas fa-exclamation-circle"></i> Important Messages</h2>
+    </div>
+
+    <div class="messages-table-container">
+        <table class="whatsapp-messages-table">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-users"></i> Group</th>
+                    <th><i class="fas fa-user"></i> Sender</th>
+                    <th><i class="fas fa-comment-alt"></i> Content</th>
+                    <th><i class="fas fa-clock"></i> Time</th>
+                    <th><i class="fas fa-star"></i> Score</th>
+                    <th><i class="fas fa-key"></i> Keywords</th>
+                    <th><i class="fas fa-cogs"></i> Method</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for message in messages %}
+                <tr class="important-message">
+                    <td>
+                        <span class="group-name">{{ message.whatsapp_group.group_name }}</span>
+                    </td>
+                    <td>
+                        <div class="sender-info">
+                            <span class="sender-name">{{ message.sender.name }}</span>
+                            <span class="sender-role">{{ message.sender.get_role_display }}</span>
+                        </div>
+                    </td>
+                    <td class="message-content">{{ message.content|truncatechars:200 }}</td>
+                    <td class="message-time">{{ message.timestamp|date:"M d, H:i" }}</td>
+                    <td class="importance-score">
+                        <span class="score-badge">{{ message.messageclassification.importance_score|floatformat:2 }}</span>
+                    </td>
+                    <td class="keywords-cell">
+                        {% if message.messageclassification.detected_keywords %}
+                            <div class="keywords-container">
+                                {% for keyword in message.messageclassification.detected_keywords %}
+                                    <span class="keyword-badge">{{ keyword }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <span class="no-keywords">None</span>
+                        {% endif %}
+                    </td>
+                    <td class="classification-method">
+                        {{ message.messageclassification.get_classification_method_display }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr class="empty-message">
+                    <td colspan="7">
+                        <i class="fas fa-info-circle"></i> No important messages found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if messages.has_other_pages %}
+    <div class="whatsapp-pagination">
+        {% if messages.has_previous %}
+            <a href="?page={{ messages.previous_page_number }}" class="pagination-link">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+        {% endif %}
+        
+        <span class="page-info">
+            Page {{ messages.number }} of {{ messages.paginator.num_pages }}
+        </span>
+        
+        {% if messages.has_next %}
+            <a href="?page={{ messages.next_page_number }}" class="pagination-link">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.whatsapp-messages-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.whatsapp-messages-header {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.whatsapp-messages-header h2 {
+    color: #075e54;
+    font-weight: 500;
+    margin: 0;
+}
+
+.messages-table-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    overflow-x: auto;
+    margin-bottom: 25px;
+}
+
+.whatsapp-messages-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.whatsapp-messages-table th {
+    text-align: left;
+    padding: 12px 15px;
+    background-color: #f0f2f5;
+    color: #075e54;
+    font-weight: 500;
+    border-bottom: 2px solid #ddd;
+    white-space: nowrap;
+}
+
+.whatsapp-messages-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+}
+
+.important-message {
+    background-color: #fff9e6;
+}
+
+.important-message:hover {
+    background-color: #fff4d1;
+}
+
+.group-name {
+    font-weight: 500;
+    color: #075e54;
+}
+
+.sender-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.sender-name {
+    font-weight: 500;
+    margin-bottom: 3px;
+}
+
+.sender-role {
+    font-size: 12px;
+    color: #666;
+    background-color: #f0f0f0;
+    padding: 2px 5px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.message-content {
+    max-width: 300px;
+    word-break: break-word;
+}
+
+.message-time {
+    white-space: nowrap;
+}
+
+.importance-score {
+    text-align: center;
+}
+
+.score-badge {
+    display: inline-block;
+    background-color: #25D366;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.keywords-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.keyword-badge {
+    background-color: #ffeb3b;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.no-keywords {
+    color: #999;
+    font-style: italic;
+}
+
+.classification-method {
+    white-space: nowrap;
+}
+
+.empty-message td {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+}
+
+.whatsapp-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.pagination-link {
+    padding: 8px 12px;
+    border-radius: 4px;
+    background-color: #f0f2f5;
+    color: #075e54;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.pagination-link:hover {
+    background-color: #25D366;
+    color: white;
+}
+
+.page-info {
+    font-weight: 500;
+    color: #495057;
+}
+
+.fas {
+    margin-right: 8px;
+}
+
+@media (max-width: 768px) {
+    .whatsapp-messages-table th, 
+    .whatsapp-messages-table td {
+        padding: 8px 10px;
+    }
+    
+    .whatsapp-pagination {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+</style>
+{% endblock %}
