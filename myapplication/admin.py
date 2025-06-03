@@ -29,19 +29,19 @@ class WhatsAppGroupAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         })
     )
-    
+
     def member_count(self, obj):
         count = obj.groupmember_set.filter(is_active=True).count()
-        url = reverse('admin:your_app_groupmember_changelist') + f'?whatsapp_group__id__exact={obj.id}'
+        url = reverse('admin:myapplication_groupmember_changelist') + f'?whatsapp_group__id__exact={obj.id}'
         return format_html('<a href="{}">{} members</a>', url, count)
     member_count.short_description = 'Active Members'
-    
+
     def message_count(self, obj):
         count = obj.message_set.count()
-        url = reverse('admin:your_app_message_changelist') + f'?whatsapp_group__id__exact={obj.id}'
+        url = reverse('admin:myapplication_message_changelist') + f'?whatsapp_group__id__exact={obj.id}'
         return format_html('<a href="{}">{} messages</a>', url, count)
     message_count.short_description = 'Total Messages'
-    
+
     def recent_activity(self, obj):
         recent_messages = obj.message_set.filter(
             timestamp__gte=timezone.now() - timedelta(days=7)
