@@ -5,8 +5,7 @@ app_name = 'chatbot'
 
 urlpatterns = [
     # Main dashboard
-    path('', views.dashboard, name='dashboard'),
-    
+    path('dashboard/', views.dashboard, name='dashboard'),
     # Group management
     path('groups/', views.group_list, name='group_list'),
     path('groups/<int:group_id>/', views.group_detail, name='group_detail'),
@@ -29,4 +28,6 @@ urlpatterns = [
 
     path('settings/', views.settings_view, name='settings'),
     path('help/', views.help_view, name='help'),
+    path('', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
 ]
