@@ -2,41 +2,210 @@
 
 {% block title %}Groups - WhatsApp Chatbot{% endblock %}
 
-{% block content %}
-<h2>WhatsApp Groups</h2>
+{% block extra_css %}
+<style>
+    .groups-container {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    
+    th {
+        background-color: #f8f9fa;
+        padding: 12px 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #555;
+        border-bottom: 2px solid #eee;
+    }
+    
+    td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+    }
+    
+    tr:hover {
+        background-color: #f9f9f9;
+    }
+    
+    .group-name {
+        font-weight: 500;
+        color: var(--whatsapp-primary);
+    }
+    
+    .group-id {
+        font-family: monospace;
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    .group-type {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .group-type-community {
+        background-color: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    .group-type-regular {
+        background-color: #e8f5e9;
+        color: #388e3c;
+    }
+    
+    .group-type-broadcast {
+        background-color: #fff3e0;
+        color: #f57c00;
+    }
+    
+    .count-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        background-color: #f0f2f5;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        min-width: 30px;
+        text-align: center;
+    }
+    
+    .actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .action-link {
+        color: var(--whatsapp-secondary);
+        text-decoration: none;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        transition: color 0.2s;
+    }
+    
+    .action-link:hover {
+        color: var(--whatsapp-primary);
+        text-decoration: underline;
+    }
+    
+    .action-link i {
+        margin-right: 3px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+    
+    .empty-state i {
+        font-size: 2rem;
+        color: #ddd;
+        margin-bottom: 15px;
+    }
+    
+    @media (max-width: 768px) {
+        .actions {
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        th, td {
+            padding: 8px 10px;
+            font-size: 0.85rem;
+        }
+    }
+</style>
+{% endblock %}
 
-<table border="1">
-    <thead>
-        <tr>
-            <th>Group Name</th>
-            <th>Group ID</th>
-            <th>Type</th>
-            <th>Members</th>
-            <th>Messages</th>
-            <th>Created</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for group in groups %}
-        <tr>
-            <td>{{ group.group_name }}</td>
-            <td>{{ group.group_id }}</td>
-            <td>{{ group.get_group_type_display }}</td>
-            <td>{{ group.member_count }}</td>
-            <td>{{ group.message_count }}</td>
-            <td>{{ group.created_at|date:"M d, Y" }}</td>
-            <td>
-                <a href="{% url 'chatbot:group_detail' group.id %}">View</a> | 
-                <a href="{% url 'chatbot:bot_configuration' group.id %}">Configure</a> |
-                <a href="{% url 'chatbot:message_summary' group.id %}">Summary</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="7">No groups found</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% block content %}
+<div class="container-fluid">
+    <div class="groups-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>WhatsApp Groups</h2>
+            <div>
+                <span class="badge bg-secondary">{{ groups|length }} groups</span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Group Name</th>
+                        <th>Group ID</th>
+                        <th>Type</th>
+                        <th>Members</th>
+                        <th>Messages</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for group in groups %}
+                    <tr>
+                        <td>
+                            <span class="group-name">{{ group.group_name }}</span>
+                        </td>
+                        <td>
+                            <span class="group-id">{{ group.group_id }}</span>
+                        </td>
+                        <td>
+                            <span class="group-type group-type-{{ group.group_type|lower }}">
+                                {{ group.get_group_type_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="count-badge">{{ group.member_count }}</span>
+                        </td>
+                        <td>
+                            <span class="count-badge">{{ group.message_count }}</span>
+                        </td>
+                        <td>
+                            {{ group.created_at|date:"M d, Y" }}
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <a href="{% url 'chatbot:group_detail' group.id %}" class="action-link">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <a href="{% url 'chatbot:bot_configuration' group.id %}" class="action-link">
+                                    <i class="fas fa-cog"></i> Configure
+                                </a>
+                                <a href="{% url 'chatbot:message_summary' group.id %}" class="action-link">
+                                    <i class="fas fa-chart-pie"></i> Summary
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <i class="fas fa-users-slash"></i>
+                                <h4>No Groups Found</h4>
+                                <p>No WhatsApp groups have been added to the system yet.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

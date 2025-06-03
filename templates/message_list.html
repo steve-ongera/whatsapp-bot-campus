@@ -2,95 +2,320 @@
 
 {% block title %}Messages - WhatsApp Chatbot{% endblock %}
 
+{% block extra_css %}
+<style>
+    .messages-container {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .filters {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+    }
+    
+    .filters form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .filters input[type="text"] {
+        flex: 1;
+        min-width: 250px;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+    
+    .filters select {
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        min-width: 200px;
+    }
+    
+    .filters label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+    
+    .filters button {
+        background-color: var(--whatsapp-light);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.2s;
+    }
+    
+    .filters button:hover {
+        background-color: #1da851;
+    }
+    
+    .filters a {
+        color: #666;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.2s;
+    }
+    
+    .filters a:hover {
+        color: var(--whatsapp-primary);
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+    
+    th {
+        background-color: #f8f9fa;
+        padding: 12px 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #555;
+        border-bottom: 2px solid #eee;
+    }
+    
+    td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+        vertical-align: top;
+    }
+    
+    tr:hover {
+        background-color: #f9f9f9 !important;
+    }
+    
+    .important-message {
+        background-color: #fff8e1 !important;
+    }
+    
+    .important-yes {
+        color: var(--whatsapp-light);
+        font-weight: 600;
+    }
+    
+    .score-high {
+        color: #e53935;
+        font-weight: 600;
+    }
+    
+    .score-medium {
+        color: #fb8c00;
+        font-weight: 600;
+    }
+    
+    .score-low {
+        color: #43a047;
+        font-weight: 600;
+    }
+    
+    .keywords {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .keyword-tag {
+        background-color: var(--whatsapp-secondary);
+        color: white;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin-top: 30px;
+    }
+    
+    .pagination a {
+        color: var(--whatsapp-primary);
+        text-decoration: none;
+        padding: 8px 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+    
+    .pagination a:hover {
+        background-color: var(--whatsapp-primary);
+        color: white;
+        border-color: var(--whatsapp-primary);
+    }
+    
+    .pagination .current {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    @media (max-width: 768px) {
+        .filters form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .filters input[type="text"],
+        .filters select {
+            width: 100%;
+            min-width: auto;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>All Messages</h2>
+<div class="container-fluid">
+    <div class="messages-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>All Messages</h2>
+            <div>
+                <span class="badge bg-secondary">{{ messages.paginator.count }} total messages</span>
+            </div>
+        </div>
 
-<div class="filters">
-    <form method="get">
-        <input type="text" name="search" placeholder="Search messages..." value="{{ search_query }}">
-        
-        <select name="group">
-            <option value="">All Groups</option>
-            {% for group in groups %}
-                <option value="{{ group.id }}" {% if request.GET.group == group.id|stringformat:"s" %}selected{% endif %}>
-                    {{ group.group_name }}
-                </option>
-            {% endfor %}
-        </select>
-        
-        <label>
-            <input type="checkbox" name="important" value="true" {% if show_important %}checked{% endif %}>
-            Important only
-        </label>
-        
-        <button type="submit">Filter</button>
-        <a href="{% url 'chatbot:message_list' %}">Clear</a>
-    </form>
+        <div class="filters">
+            <form method="get">
+                <input type="text" name="search" placeholder="Search messages..." value="{{ search_query }}">
+                
+                <select name="group">
+                    <option value="">All Groups</option>
+                    {% for group in groups %}
+                        <option value="{{ group.id }}" {% if request.GET.group == group.id|stringformat:"s" %}selected{% endif %}>
+                            {{ group.group_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                
+                <label>
+                    <input type="checkbox" name="important" value="true" {% if show_important %}checked{% endif %}>
+                    Important only
+                </label>
+                
+                <button type="submit">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                <a href="{% url 'chatbot:message_list' %}">
+                    <i class="fas fa-times"></i> Clear
+                </a>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Group</th>
+                        <th>Sender</th>
+                        <th>Content</th>
+                        <th>Time</th>
+                        <th>Type</th>
+                        <th>Important</th>
+                        <th>Score</th>
+                        <th>Keywords</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for message in messages %}
+                    <tr class="{% if message.messageclassification.is_important %}important-message{% endif %}">
+                        <td>
+                            <strong>{{ message.whatsapp_group.group_name }}</strong>
+                        </td>
+                        <td>
+                            {{ message.sender.name }}
+                            <span class="badge bg-light text-dark">{{ message.sender.get_role_display }}</span>
+                        </td>
+                        <td>{{ message.content|truncatechars:150 }}</td>
+                        <td>{{ message.timestamp|date:"M d, H:i" }}</td>
+                        <td>
+                            <span class="badge bg-secondary">{{ message.get_message_type_display }}</span>
+                        </td>
+                        <td>
+                            {% if message.messageclassification.is_important %}
+                                <span class="important-yes">YES</span>
+                            {% else %}
+                                No
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if message.messageclassification %}
+                                {% with score=message.messageclassification.importance_score %}
+                                    {% if score >= 0.7 %}
+                                        <span class="score-high">{{ score|floatformat:2 }}</span>
+                                    {% elif score >= 0.4 %}
+                                        <span class="score-medium">{{ score|floatformat:2 }}</span>
+                                    {% else %}
+                                        <span class="score-low">{{ score|floatformat:2 }}</span>
+                                    {% endif %}
+                                {% endwith %}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if message.messageclassification.detected_keywords %}
+                                <div class="keywords">
+                                    {% for keyword in message.messageclassification.detected_keywords %}
+                                        <span class="keyword-tag">{{ keyword }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                None
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4">No messages found matching your criteria</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if messages.has_other_pages %}
+        <div class="pagination">
+            {% if messages.has_previous %}
+                <a href="?page={{ messages.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}{% if request.GET.important %}&important={{ request.GET.important }}{% endif %}">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
+            {% endif %}
+            
+            <span class="current">
+                Page {{ messages.number }} of {{ messages.paginator.num_pages }}
+            </span>
+            
+            {% if messages.has_next %}
+                <a href="?page={{ messages.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}{% if request.GET.important %}&important={{ request.GET.important }}{% endif %}">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
 </div>
-
-<table border="1">
-    <thead>
-        <tr>
-            <th>Group</th>
-            <th>Sender</th>
-            <th>Content</th>
-            <th>Time</th>
-            <th>Type</th>
-            <th>Important</th>
-            <th>Score</th>
-            <th>Keywords</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for message in messages %}
-        <tr {% if message.messageclassification.is_important %}style="background-color: #ffffcc;"{% endif %}>
-            <td>{{ message.whatsapp_group.group_name }}</td>
-            <td>{{ message.sender.name }} ({{ message.sender.get_role_display }})</td>
-            <td>{{ message.content|truncatechars:150 }}</td>
-            <td>{{ message.timestamp|date:"M d, H:i" }}</td>
-            <td>{{ message.get_message_type_display }}</td>
-            <td>
-                {% if message.messageclassification.is_important %}
-                    <strong>YES</strong>
-                {% else %}
-                    No
-                {% endif %}
-            </td>
-            <td>
-                {% if message.messageclassification %}
-                    {{ message.messageclassification.importance_score|floatformat:2 }}
-                {% else %}
-                    N/A
-                {% endif %}
-            </td>
-            <td>
-                {% if message.messageclassification.detected_keywords %}
-                    {{ message.messageclassification.detected_keywords|join:", " }}
-                {% else %}
-                    None
-                {% endif %}
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="8">No messages found</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<!-- Pagination -->
-{% if messages.has_other_pages %}
-<div class="pagination">
-    {% if messages.has_previous %}
-        <a href="?page={{ messages.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}{% if request.GET.important %}&important={{ request.GET.important }}{% endif %}">&laquo; Previous</a>
-    {% endif %}
-    
-    Page {{ messages.number }} of {{ messages.paginator.num_pages }}
-    
-    {% if messages.has_next %}
-        <a href="?page={{ messages.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}{% if request.GET.important %}&important={{ request.GET.important }}{% endif %}">Next &raquo;</a>
-    {% endif %}
-</div>
-{% endif %}
 {% endblock %}

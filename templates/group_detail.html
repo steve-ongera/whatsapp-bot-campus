@@ -1,113 +1,322 @@
-{% extends 'chatbot/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}{{ group.group_name }} - WhatsApp Chatbot{% endblock %}
 
-{% block content %}
-<h2>{{ group.group_name }}</h2>
-
-<div class="group-info">
-    <p><strong>Group ID:</strong> {{ group.group_id }}</p>
-    <p><strong>Type:</strong> {{ group.get_group_type_display }}</p>
-    <p><strong>Created:</strong> {{ group.created_at|date:"M d, Y H:i" }}</p>
-    <p><strong>Active:</strong> {% if group.is_active %}Yes{% else %}No{% endif %}</p>
-</div>
-
-<div class="actions">
-    <a href="{% url 'chatbot:bot_configuration' group.id %}">Configure Bot</a> | 
-    <a href="{% url 'chatbot:message_summary' group.id %}">Generate Summary</a>
-</div>
-
-{% if bot_config %}
-<div class="bot-config">
-    <h3>Bot Configuration</h3>
-    <p>Auto Broadcast: {% if bot_config.auto_broadcast_important %}Enabled{% else %}Disabled{% endif %}</p>
-    <p>Minimum Importance Score: {{ bot_config.minimum_importance_score }}</p>
-    <p>Keyword Detection: {% if bot_config.enable_keyword_detection %}Enabled{% else %}Disabled{% endif %}</p>
-</div>
-{% endif %}
-
-<div class="members">
-    <h3>Group Members ({{ members.count }})</h3>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Role</th>
-                <th>Joined</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for member in members %}
-            <tr>
-                <td>{{ member.name }}</td>
-                <td>{{ member.phone_number }}</td>
-                <td>{{ member.get_role_display }}</td>
-                <td>{{ member.joined_at|date:"M d, Y" }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4">No members found</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<div class="messages">
-    <h3>Recent Messages</h3>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Sender</th>
-                <th>Content</th>
-                <th>Time</th>
-                <th>Important</th>
-                <th>Score</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for message in messages %}
-            <tr>
-                <td>{{ message.sender.name }}</td>
-                <td>{{ message.content|truncatechars:100 }}</td>
-                <td>{{ message.timestamp|date:"M d, H:i" }}</td>
-                <td>
-                    {% if message.messageclassification.is_important %}
-                        <strong>YES</strong>
-                    {% else %}
-                        No
-                    {% endif %}
-                </td>
-                <td>
-                    {% if message.messageclassification %}
-                        {{ message.messageclassification.importance_score|floatformat:2 }}
-                    {% else %}
-                        N/A
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5">No messages found</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% block extra_css %}
+<style>
+    .chat-container {
+        display: flex;
+        height: calc(100vh - 180px);
+        max-height: 800px;
+        background-color: #e5ddd5;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    }
     
-    <!-- Pagination -->
-    {% if messages.has_other_pages %}
-    <div class="pagination">
-        {% if messages.has_previous %}
-            <a href="?page={{ messages.previous_page_number }}">&laquo; Previous</a>
+    .chat-sidebar {
+        width: 300px;
+        background-color: white;
+        border-right: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .chat-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #e5ddd5;
+        background-image: url('https://web.whatsapp.com/img/bg-chat-tile-light_a4be512e7195b6b733d9110b408f075d.png');
+        background-repeat: repeat;
+    }
+    
+    /* Group Info Header */
+    .group-header {
+        padding: 15px;
+        background-color: #f0f2f5;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .group-header h2 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #333;
+    }
+    
+    .group-meta {
+        font-size: 0.8rem;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    /* Member List */
+    .member-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px 0;
+    }
+    
+    .member-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 15px;
+        cursor: pointer;
+    }
+    
+    .member-item:hover {
+        background-color: #f5f5f5;
+    }
+    
+    .member-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #ddd;
+        margin-right: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+        font-weight: bold;
+    }
+    
+    .member-info {
+        flex: 1;
+    }
+    
+    .member-name {
+        font-weight: 500;
+        color: #333;
+    }
+    
+    .member-role {
+        font-size: 0.75rem;
+        color: #666;
+    }
+    
+    /* Chat Area */
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .message {
+        max-width: 70%;
+        margin-bottom: 15px;
+        padding: 8px 12px;
+        border-radius: 7.5px;
+        position: relative;
+        word-wrap: break-word;
+    }
+    
+    .message-incoming {
+        align-self: flex-start;
+        background-color: white;
+        border-top-left-radius: 0;
+    }
+    
+    .message-outgoing {
+        align-self: flex-end;
+        background-color: #dcf8c6;
+        border-top-right-radius: 0;
+    }
+    
+    .message-sender {
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: #075e54;
+        margin-bottom: 3px;
+    }
+    
+    .message-content {
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+    
+    .message-time {
+        text-align: right;
+        font-size: 0.7rem;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    .message-important {
+        border-left: 3px solid #25d366;
+        padding-left: 9px;
+    }
+    
+    /* Chat Input */
+    .chat-input {
+        padding: 10px;
+        background-color: #f0f2f5;
+        border-top: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+    }
+    
+    .chat-input input {
+        flex: 1;
+        padding: 10px 15px;
+        border-radius: 20px;
+        border: none;
+        outline: none;
+        font-size: 0.95rem;
+    }
+    
+    .chat-input button {
+        background: none;
+        border: none;
+        color: #075e54;
+        font-size: 1.2rem;
+        margin-left: 10px;
+        cursor: pointer;
+    }
+    
+    /* Bot Config Section */
+    .bot-config-card {
+        background-color: white;
+        padding: 15px;
+        margin: 15px;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .bot-config-card h3 {
+        margin-top: 0;
+        font-size: 1rem;
+        color: #075e54;
+    }
+    
+    .config-item {
+        margin-bottom: 8px;
+        font-size: 0.85rem;
+    }
+    
+    .config-label {
+        font-weight: 500;
+        color: #333;
+    }
+    
+    /* Empty States */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+    
+    .empty-state i {
+        font-size: 2rem;
+        color: #ddd;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <!-- Left Sidebar -->
+    <div class="chat-sidebar">
+        <div class="group-header">
+            <h2>{{ group.group_name }}</h2>
+            <div class="group-meta">
+                <p>Created: {{ group.created_at|date:"M d, Y" }}</p>
+                <p>ID: {{ group.group_id }}</p>
+                <p>Type: {{ group.get_group_type_display }}</p>
+            </div>
+        </div>
+        
+        <!-- Bot Configuration -->
+        {% if bot_config %}
+        <div class="bot-config-card">
+            <h3>Bot Configuration</h3>
+            <div class="config-item">
+                <span class="config-label">Auto Broadcast:</span>
+                {% if bot_config.auto_broadcast_important %}Enabled{% else %}Disabled{% endif %}
+            </div>
+            <div class="config-item">
+                <span class="config-label">Min Importance Score:</span>
+                {{ bot_config.minimum_importance_score }}
+            </div>
+            <div class="config-item">
+                <span class="config-label">Keyword Detection:</span>
+                {% if bot_config.enable_keyword_detection %}Enabled{% else %}Disabled{% endif %}
+            </div>
+            <div class="actions" style="margin-top: 10px;">
+                <a href="{% url 'chatbot:bot_configuration' group.id %}" style="font-size: 0.8rem;">Edit Configuration</a>
+            </div>
+        </div>
         {% endif %}
         
-        Page {{ messages.number }} of {{ messages.paginator.num_pages }}
-        
-        {% if messages.has_next %}
-            <a href="?page={{ messages.next_page_number }}">Next &raquo;</a>
-        {% endif %}
+        <!-- Member List -->
+        <div class="member-list">
+            <h4 style="padding: 0 15px; margin-bottom: 10px;">Members ({{ members.count }})</h4>
+            {% for member in members %}
+            <div class="member-item">
+                <div class="member-avatar">{{ member.name|first|upper }}</div>
+                <div class="member-info">
+                    <div class="member-name">{{ member.name }}</div>
+                    <div class="member-role">{{ member.get_role_display }}</div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <i class="fas fa-users-slash"></i>
+                <p>No members found</p>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-    {% endif %}
+    
+    <!-- Main Chat Area -->
+    <div class="chat-main">
+        <div class="chat-messages">
+            {% for message in messages %}
+            <div class="message {% if message.sender.role == 'admin' %}message-outgoing{% else %}message-incoming{% endif %} {% if message.messageclassification.is_important %}message-important{% endif %}">
+                <div class="message-sender">{{ message.sender.name }}</div>
+                <div class="message-content">{{ message.content }}</div>
+                <div class="message-time">
+                    {{ message.timestamp|date:"H:i" }}
+                    {% if message.messageclassification.is_important %}
+                        <i class="fas fa-star" style="color: #25d366; margin-left: 5px;"></i>
+                    {% endif %}
+                    {% if message.messageclassification %}
+                        <span style="margin-left: 5px;">({{ message.messageclassification.importance_score|floatformat:2 }})</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state" style="margin: auto;">
+                <i class="fas fa-comment-slash"></i>
+                <h4>No Messages Yet</h4>
+                <p>Start the conversation in this group</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if messages.has_other_pages %}
+        <div style="padding: 10px; text-align: center; background-color: #f0f2f5; border-top: 1px solid #ddd;">
+            {% if messages.has_previous %}
+                <a href="?page={{ messages.previous_page_number }}" style="margin-right: 15px;">&laquo; Previous</a>
+            {% endif %}
+            
+            <span>Page {{ messages.number }} of {{ messages.paginator.num_pages }}</span>
+            
+            {% if messages.has_next %}
+                <a href="?page={{ messages.next_page_number }}" style="margin-left: 15px;">Next &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <!-- Chat Input (simulated) -->
+        <div class="chat-input">
+            <input type="text" placeholder="Type a message (simulated interface)">
+            <button type="button"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
 </div>
 {% endblock %}
