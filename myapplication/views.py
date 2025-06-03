@@ -161,7 +161,7 @@ def bot_configuration(request, group_id):
         messages.success(request, 'Bot configuration updated successfully!')
         return redirect('group_detail', group_id=group.id)
     
-    return render(request, 'chatbot/bot_configuration.html', {
+    return render(request, 'bot_configuration.html', {
         'group': group,
         'config': config
     })
@@ -207,7 +207,7 @@ def analytics(request):
         'group_stats': group_stats,
         'accuracy_rate': round((important_messages / total_messages * 100) if total_messages > 0 else 0, 2)
     }
-    return render(request, 'chatbot/analytics.html', context)
+    return render(request, 'analytics.html', context)
 
 
 @csrf_exempt
@@ -351,4 +351,4 @@ def message_summary(request, group_id):
         'important_messages': important_messages.count()
     }
     
-    return render(request, 'chatbot/message_summary.html', context)
+    return render(request, 'message_summary.html', context)

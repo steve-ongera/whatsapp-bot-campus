@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -271,7 +272,7 @@
                 <div class="d-flex align-items-center ms-auto">
                     <div class="dropdown">
                         <a class="btn dropdown-toggle d-flex align-items-center user-dropdown" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="https://via.placeholder.com/40" alt="User profile">
+                            <img src="{% static 'img/profile.png'%}" alt="User profile">
                             <span>Admin User</span>
                         </a>
                         

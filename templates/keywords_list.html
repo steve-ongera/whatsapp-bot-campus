@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}Keywords - WhatsApp Chatbot{% endblock %}
+
+{% block content %}
+<div class="whatsapp-keywords-container">
+    <div class="whatsapp-keywords-header">
+        <h2><i class="fas fa-key"></i> Important Keywords Management</h2>
+        <div class="actions">
+            <a href="{% url 'chatbot:add_keyword' %}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Add New Keyword
+            </a>
+        </div>
+    </div>
+
+    <div class="whatsapp-keywords-table-container">
+        <table class="whatsapp-keywords-table">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-font"></i> Keyword</th>
+                    <th><i class="fas fa-tag"></i> Category</th>
+                    <th><i class="fas fa-weight-hanging"></i> Weight</th>
+                    <th><i class="fas fa-calendar-alt"></i> Created</th>
+                    <th><i class="fas fa-circle"></i> Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for keyword in keywords %}
+                <tr>
+                    <td>{{ keyword.keyword }}</td>
+                    <td>{{ keyword.get_category_display }}</td>
+                    <td>{{ keyword.weight }}</td>
+                    <td>{{ keyword.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <span class="status-badge {% if keyword.is_active %}active{% else %}inactive{% endif %}">
+                            {% if keyword.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr class="empty-row">
+                    <td colspan="5">
+                        <i class="fas fa-info-circle"></i> No keywords found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.whatsapp-keywords-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.whatsapp-keywords-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.whatsapp-keywords-header h2 {
+    color: #075e54;
+    font-weight: 500;
+    margin: 0;
+}
+
+.actions .btn {
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-success {
+    background-color: #25D366;
+    color: white;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #128C7E;
+}
+
+.whatsapp-keywords-table-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    overflow-x: auto;
+}
+
+.whatsapp-keywords-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.whatsapp-keywords-table th {
+    text-align: left;
+    padding: 12px 15px;
+    background-color: #f0f2f5;
+    color: #075e54;
+    font-weight: 500;
+    border-bottom: 2px solid #ddd;
+}
+
+.whatsapp-keywords-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.whatsapp-keywords-table tr:last-child td {
+    border-bottom: none;
+}
+
+.whatsapp-keywords-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background-color: #e1f7ea;
+    color: #128C7E;
+}
+
+.status-badge.inactive {
+    background-color: #f5e8e8;
+    color: #dc3545;
+}
+
+.empty-row td {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+}
+
+.fas {
+    margin-right: 8px;
+    font-size: 12px;
+    color: #666;
+}
+
+@media (max-width: 768px) {
+    .whatsapp-keywords-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .whatsapp-keywords-table th, 
+    .whatsapp-keywords-table td {
+        padding: 8px 10px;
+    }
+}
+</style>
+{% endblock %}

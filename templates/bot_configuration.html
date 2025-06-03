@@ -1,56 +1,200 @@
-{% extends 'chatbot/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Bot Configuration - {{ group.group_name }}{% endblock %}
 
 {% block content %}
-<h2>Bot Configuration for {{ group.group_name }}</h2>
+<div class="whatsapp-config-container">
+    <div class="whatsapp-config-header">
+        <h2><i class="fas fa-cog"></i> Bot Configuration - {{ group.group_name }}</h2>
+    </div>
+    
+    <form method="post" class="whatsapp-config-form">
+        {% csrf_token %}
+        
+        <div class="config-section">
+            <h3 class="section-title">Broadcast Settings</h3>
+            <div class="form-group">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="auto_broadcast" name="auto_broadcast" {% if config.auto_broadcast_important %}checked{% endif %}>
+                    <label class="form-check-label" for="auto_broadcast">Auto-broadcast important messages</label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="min_score">Minimum Importance Score</label>
+                <small class="form-text text-muted">(0.0 - 1.0, where 1.0 is most important)</small>
+                <input type="number" class="form-control" id="min_score" name="min_score" step="0.1" min="0" max="1" value="{{ config.minimum_importance_score }}">
+            </div>
+        </div>
+        
+        <div class="config-section">
+            <h3 class="section-title">Escalation Settings</h3>
+            <div class="form-group">
+                <label for="escalation_threshold">Escalation Threshold</label>
+                <small class="form-text text-muted">(0.0 - 1.0, messages above this will be escalated)</small>
+                <input type="number" class="form-control" id="escalation_threshold" name="escalation_threshold" step="0.1" min="0" max="1" value="{{ config.escalation_threshold }}">
+            </div>
+        </div>
+        
+        <div class="config-section">
+            <h3 class="section-title">Detection Settings</h3>
+            <div class="form-group">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="keyword_detection" name="keyword_detection" {% if config.enable_keyword_detection %}checked{% endif %}>
+                    <label class="form-check-label" for="keyword_detection">Enable keyword detection</label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="sender_priority" name="sender_priority" {% if config.enable_sender_role_priority %}checked{% endif %}>
+                    <label class="form-check-label" for="sender_priority">Prioritize messages from admins/important senders</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="config-section">
+            <h3 class="section-title">Timing Settings</h3>
+            <div class="form-group">
+                <label for="delay_minutes">Notification delay (minutes)</label>
+                <input type="number" class="form-control" id="delay_minutes" name="delay_minutes" min="0" value="{{ config.notification_delay_minutes }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="max_messages">Max messages per hour</label>
+                <input type="number" class="form-control" id="max_messages" name="max_messages" min="1" value="{{ config.max_messages_per_hour }}">
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Configuration</button>
+            <a href="{% url 'chatbot:group_detail' group.id %}" class="btn btn-outline-secondary"><i class="fas fa-times"></i> Cancel</a>
+        </div>
+    </form>
+</div>
 
-<form method="post">
-    {% csrf_token %}
-    <div>
-        <label>
-            <input type="checkbox" name="auto_broadcast" {% if config.auto_broadcast_important %}checked{% endif %}>
-            Auto-broadcast important messages
-        </label>
-    </div>
-    
-    <div>
-        <label for="min_score">Minimum Importance Score (0.0 - 1.0):</label>
-        <input type="number" id="min_score" name="min_score" step="0.1" min="0" max="1" value="{{ config.minimum_importance_score }}">
-    </div>
-    
-    <div>
-        <label for="escalation_threshold">Escalation Threshold (0.0 - 1.0):</label>
-        <input type="number" id="escalation_threshold" name="escalation_threshold" step="0.1" min="0" max="1" value="{{ config.escalation_threshold }}">
-    </div>
-    
-    <div>
-        <label>
-            <input type="checkbox" name="keyword_detection" {% if config.enable_keyword_detection %}checked{% endif %}>
-            Enable keyword detection
-        </label>
-    </div>
-    
-    <div>
-        <label>
-            <input type="checkbox" name="sender_priority" {% if config.enable_sender_role_priority %}checked{% endif %}>
-            Enable sender role priority
-        </label>
-    </div>
-    
-    <div>
-        <label for="delay_minutes">Notification delay (minutes):</label>
-        <input type="number" id="delay_minutes" name="delay_minutes" min="0" value="{{ config.notification_delay_minutes }}">
-    </div>
-    
-    <div>
-        <label for="max_messages">Max messages per hour:</label>
-        <input type="number" id="max_messages" name="max_messages" min="1" value="{{ config.max_messages_per_hour }}">
-    </div>
-    
-    <div>
-        <button type="submit">Save Configuration</button>
-        <a href="{% url 'chatbot:group_detail' group.id %}">Cancel</a>
-    </div>
-</form>
+<style>
+.whatsapp-config-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.whatsapp-config-header {
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.whatsapp-config-header h2 {
+    color: #075e54;
+    font-weight: 500;
+}
+
+.whatsapp-config-form {
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.config-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.config-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.section-title {
+    color: #075e54;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-control:focus {
+    border-color: #25D366;
+    box-shadow: 0 0 0 0.2rem rgba(37, 211, 102, 0.25);
+}
+
+.form-check {
+    margin-bottom: 10px;
+}
+
+.form-check-input {
+    margin-right: 8px;
+}
+
+.form-check-label {
+    user-select: none;
+}
+
+.form-text {
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background-color: #25D366;
+    border-color: #25D366;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #128C7E;
+    border-color: #128C7E;
+}
+
+.btn-outline-secondary {
+    border: 1px solid #ddd;
+    color: #495057;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+}
+
+.fas {
+    margin-right: 8px;
+}
+</style>
 {% endblock %}
