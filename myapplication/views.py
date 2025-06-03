@@ -159,7 +159,7 @@ def bot_configuration(request, group_id):
         config.save()
         
         messages.success(request, 'Bot configuration updated successfully!')
-        return redirect('group_detail', group_id=group.id)
+        return redirect('chatbot:group_detail', group_id=group.id)
     
     return render(request, 'bot_configuration.html', {
         'group': group,
